@@ -1,3 +1,4 @@
 # Summary
 
-Codes to upload ODOM and IMU ROS-data on blockchain.
+
+Using blockchain and ROS in safety inspections.

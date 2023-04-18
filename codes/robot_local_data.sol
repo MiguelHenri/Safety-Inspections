@@ -4,7 +4,13 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract RobotLocalizationData {
 
-    uint public DATASIZE = 0;
+    string public place;
+    address[] public inspectors;
+
+    constructor(string memory _place, address[] memory _inspectors) {
+    	place = _place;
+    	inspectors = _inspectors;
+    }
 
     struct Time {
         uint32 secs;

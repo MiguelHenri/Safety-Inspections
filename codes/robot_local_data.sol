@@ -5,11 +5,11 @@ pragma solidity >=0.7.0 <0.9.0;
 contract RobotLocalizationData {
 
     string public place;
-    address[] public inspectors;
+    address[] public inspector;
 
-    constructor(string memory _place, address[] memory _inspectors) {
+    constructor(string _place, address[] _inspector) {
     	place = _place;
-    	inspectors = _inspectors;
+    	inspector = _inspector;
     }
 
     struct Time {

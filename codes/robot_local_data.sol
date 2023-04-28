@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.2 <0.9.0;
 
 contract RobotLocalizationData {
 
-    string public place;
-    address[] public inspector;
+    // Private variable that stores the place of inspection
+    string private place;
+    // Private variable that stores the date of inspection
+    string private date;
+    // Private variable that stores an array of inspector adresses
+    address[] private inspectors;
 
-    constructor(string _place, address[] _inspector) {
+    constructor(string memory _place, string memory _date, address[] memory _inspectors) {
     	place = _place;
-    	inspector = _inspector;
+        date = _date;
+    	inspectors = _inspectors;
     }
 
     struct Time {
@@ -90,6 +95,7 @@ contract RobotLocalizationData {
         Group linear_acceleration;
     }
 
+    // Public variables that stores robot data
     Odom public odom;
     ImuAngular public imu_angular;
     ImuMag public imu_mag;

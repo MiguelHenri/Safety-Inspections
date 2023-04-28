@@ -15,6 +15,7 @@ contract RequestContract {
     struct Request {
         address requester;
         string date;
+        string inspection_type;
     }
 
     // Private array of inspection requests
@@ -27,11 +28,10 @@ contract RequestContract {
     }
 
     // InpectionRequest function creates an inspection request and adds it to the requests array if the requested location is valid
-    function InpectionRequest(string memory _date) public {
-        require(msg.sender == manager, "only manager is allowed to request inspection"); // NEEDED??
+    function InpectionRequest(string memory _date,  string memory _inspection_type) public {
 
-        // Add a new Request to the requests array with the requester's address, date of inspection, and location of inspection
-        requests.push(Request(msg.sender, _date));
+        // Add a new Request to the requests array with the requester's address and date of inspection
+        requests.push(Request(msg.sender, _date, _inspection_type));
     }
 
     // getPlace function returns the place of inspection

@@ -14,7 +14,6 @@ contract ResultsContract {
     // Result is a struct that represents the results of an inspection
     struct Result {
         address inspector;
-        string location;
         string result;
         string IPFS_rosbag_cid;
     }
@@ -30,18 +29,17 @@ contract ResultsContract {
 
     // InspectionResult function creates an inspection result and adds it to the results array
     function InspectionResult(
-        string memory _InspectionPlace,
         string memory _result,
         string memory _IPFS_rosbag_cid
     ) public {
         // Add a new Result to the results array with the inspector's address, location of inspection, and the result of the inspection
         results.push(
-            Result(msg.sender, _InspectionPlace, _result, _IPFS_rosbag_cid)
+            Result(msg.sender, _result, _IPFS_rosbag_cid)
         );
     }
 
     // GetResults function returns the array of results
-    function getValidLocations() public view returns (Result[] memory) {
+    function getResults() public view returns (Result[] memory) {
         return results;
     }
 }

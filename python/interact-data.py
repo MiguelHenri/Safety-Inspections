@@ -239,6 +239,7 @@ def compile_sol():
     return compiled_sol
 
 def interact(w3, compiled_sol):
+    print('Interacting...')
     # Retrieve the contract interface
     contract_id, contract_interface = compiled_sol.popitem()
 
@@ -257,10 +258,12 @@ def interact(w3, compiled_sol):
 
     nonce = w3.eth.get_transaction_count(fromAddress)
 
-    # Contract Address
+    # Contract Address and Getting contract
     contractAddress = '0xe135783649BfA7c9c4c6F8E528C7f56166efC8a6'
+    contract = w3.eth.contract(abi=abi, address=contractAddress)
 
-    # contract = w3.eth.contract(abi=abi, address=contractAddress, bytecode=bytecode)
+    # Setting function and getting data
+    data = contract.encodeABI(fn_name='updateImuMag', args=[0, 0, 0, "oi", [0, 0, 0]])
 
     rawtxOptions = {
         'to': contractAddress,  
@@ -268,7 +271,7 @@ def interact(w3, compiled_sol):
         'gas': 2000000,
         'gasPrice': w3.to_wei('50', 'gwei'),
         'nonce': nonce,
-        'data': bytecode,  
+        'data': data,  
         'chainId': 1337
     }
 
@@ -281,6 +284,7 @@ def interact(w3, compiled_sol):
 
     print(receipt)
 
+    print('Done!')
 
 def main():
     # Compiling solidity contract

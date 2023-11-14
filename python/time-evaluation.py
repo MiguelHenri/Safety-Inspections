@@ -19,20 +19,20 @@ class Data:
 	nsecs: int = -1
 	frame_id: str = ""
 	child_frame_id: str = ""
-	position_x: float = 0.0
-	position_y: float = 0.0
-	position_z: float = 0.0
-	orientation_x: float = 0.0
-	orientation_y: float = 0.0
-	orientation_z: float = 0.0
-	orientation_w: float = 0.0
+	position_x: int = -1
+	position_y: int = -1
+	position_z: int = -1
+	orientation_x: int = -1
+	orientation_y: int = -1
+	orientation_z: int = -1
+	orientation_w: int = -1
 	covariance: list = []
-	linear_x: float = 0.0
-	linear_y: float = 0.0
-	linear_z: float = 0.0
-	angular_x: float = 0.0
-	angular_y: float = 0.0
-	angular_z: float = 0.0
+	linear_x: int = -1
+	linear_y: int = -1
+	linear_z: int = -1
+	angular_x: int = -1
+	angular_y: int = -1
+	angular_z: int = -1
 	twist_covariance: list = []
 	
 	def __str__(self):
@@ -49,27 +49,29 @@ def clear(block):
 	
 	clean = Data()
 	data = yaml.safe_load(block)
-
-	clean.seq = data['header']['seq']
-	clean.secs = data['header']['stamp']['secs']
-	clean.nsecs = data['header']['stamp']['nsecs']
+    
+	clean.seq = int(data['header']['seq'])
+	clean.secs = int(data['header']['stamp']['secs'])
+	clean.nsecs = int(data['header']['stamp']['nsecs'])
 	clean.frame_id = data['header']['frame_id']
 	clean.child_frame_id = data['child_frame_id']
-	clean.position_x = data['pose']['pose']['position']['x']
-	clean.position_y = data['pose']['pose']['position']['y']
-	clean.position_z = data['pose']['pose']['position']['z']
-	clean.orientation_x = data['pose']['pose']['orientation']['x']
-	clean.orientation_y = data['pose']['pose']['orientation']['y']
-	clean.orientation_z = data['pose']['pose']['orientation']['z']
-	clean.orientation_w = data['pose']['pose']['orientation']['w']
+	clean.position_x = int(data['pose']['pose']['position']['x'])
+	clean.position_y = int(data['pose']['pose']['position']['y'])
+	clean.position_z = int(data['pose']['pose']['position']['z'])
+	clean.orientation_x = int(data['pose']['pose']['orientation']['x'])
+	clean.orientation_y = int(data['pose']['pose']['orientation']['y'])
+	clean.orientation_z = int(data['pose']['pose']['orientation']['z'])
+	clean.orientation_w = int(data['pose']['pose']['orientation']['w'])
 	clean.covariance = data['pose']['covariance']
-	clean.linear_x = data['twist']['twist']['linear']['x']
-	clean.linear_y = data['twist']['twist']['linear']['y']
-	clean.linear_z = data['twist']['twist']['linear']['z']
-	clean.angular_x = data['twist']['twist']['angular']['x']
-	clean.angular_y = data['twist']['twist']['angular']['y']
-	clean.angular_z = data['twist']['twist']['angular']['z']
+	clean.covariance = [int(i) for i in clean.covariance]
+	clean.linear_x = int(data['twist']['twist']['linear']['x'])
+	clean.linear_y = int(data['twist']['twist']['linear']['y'])
+	clean.linear_z = int(data['twist']['twist']['linear']['z'])
+	clean.angular_x = int(data['twist']['twist']['angular']['x'])
+	clean.angular_y = int(data['twist']['twist']['angular']['y'])
+	clean.angular_z = int(data['twist']['twist']['angular']['z'])
 	clean.twist_covariance = data['twist']['covariance']
+	clean.twist_covariance = [int(i) for i in clean.twist_covariance]
 		
 	return clean
 
@@ -369,7 +371,7 @@ def interact(w3, compiled_sol, odom_data):
     fromAddress = account.address
 
     # Contract Address and Getting contract
-    contractAddress = '0x2114De86c8Ea1FD8144C2f1e1e94C74E498afB1b'
+    contractAddress = '0x029615037aB40b164015683B5a646913704A7ee5'
     contract = w3.eth.contract(abi=abi, address=contractAddress)
     
     transaction_times = []
@@ -458,6 +460,9 @@ def main():
 
     # Sending transactions and getting its time
     transaction_times = interact(w3, compiled_sol, odom_data)
+
+    for time in transaction_times:
+        print(time)
 
     # Plotting evaluation results
     plot_box_plot(transaction_times)

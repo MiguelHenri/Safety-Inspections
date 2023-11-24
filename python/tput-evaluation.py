@@ -3,12 +3,13 @@
 # and evaluates the transaction time
 
 from dataclasses import dataclass
-import sys
 import yaml
 from web3 import Web3
 from eth_account import Account
 from solcx import compile_source
 from web3.middleware import geth_poa_middleware
+import matplotlib.pyplot as plt
+import asyncio
 import time
 
 # Odom Data structure
@@ -87,31 +88,6 @@ def clean_odom(file_name):
 			clean_blocks.append(clear(block))
 			
 	return clean_blocks
-
-# Debugging clean_odom
-def print_odom(odom_data):
-    for odom in odom_data:
-            print('--This--')
-            print(odom.seq)
-            print(odom.secs)
-            print(odom.nsecs)
-            print(odom.frame_id)
-            print(odom.child_frame_id)
-            print([odom.position_x,
-                odom.position_y,
-                odom.position_z])
-            print([odom.orientation_x,
-                odom.orientation_y,
-                odom.orientation_z,
-                odom.orientation_w])
-            print(odom.covariance)
-            print([odom.linear_x,
-                odom.linear_y,
-                odom.linear_z])
-            print([odom.angular_x,
-                odom.angular_y,
-                odom.angular_z])
-            print(odom.twist_covariance)
 
 # This function is used to compile our Robot Local Data smart contract
 def compile_sol():
@@ -349,7 +325,116 @@ def compile_sol():
     return compiled_sol
 
 # This function is used to interact with the blockchain
-def interact(w3, compiled_sol, odom_data):
+async def transact(w3, contract, fromAddress, contractAddress, privateKey, odom):
+    
+    data = contract.encodeABI(fn_name='updateOdom', args=[odom.seq,
+                                                          odom.secs,
+                                                          odom.nsecs,
+                                                          odom.frame_id,
+                                                          odom.child_frame_id,
+                                                          [odom.position_x,
+                                                           odom.position_y,
+                                                           odom.position_z],
+                                                          [odom.orientation_x,
+                                                           odom.orientation_y,
+                                                           odom.orientation_z,
+                                                           odom.orientation_w],
+                                                          odom.covariance,
+                                                          [odom.linear_x,
+                                                           odom.linear_y,
+                                                           odom.linear_z],
+                                                          [odom.angular_x,
+                                                           odom.angular_y,
+                                                           odom.angular_z],
+                                                          odom.twist_covariance]
+                                                          )
+
+    nonce = w3.eth.get_transaction_count(fromAddress)
+    rawtxOptions = {
+        'to': contractAddress,
+        'value': 0,
+        'gas': 2000000,
+        'gasPrice': w3.to_wei('50', 'gwei'),
+        'nonce': nonce,
+        'data': data,
+        'chainId': 1337
+    }
+
+    # Interacting with contract function
+    signed_txn = w3.eth.account.sign_transaction(rawtxOptions, privateKey)
+	
+    # Send transaction
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+	
+    # Transaction Done
+    receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    print(receipt)
+
+# Lot transacting
+async def lot_transact(w3, contract, fromAddress, contractAddress, privateKey, transactions):
+    tasks = []
+    for odom in transactions:
+    
+        data = contract.encodeABI(fn_name='updateOdom', args=[odom.seq,
+                                                          odom.secs,
+                                                          odom.nsecs,
+                                                          odom.frame_id,
+                                                          odom.child_frame_id,
+                                                          [odom.position_x,
+                                                           odom.position_y,
+                                                           odom.position_z],
+                                                          [odom.orientation_x,
+                                                           odom.orientation_y,
+                                                           odom.orientation_z,
+                                                           odom.orientation_w],
+                                                          odom.covariance,
+                                                          [odom.linear_x,
+                                                           odom.linear_y,
+                                                           odom.linear_z],
+                                                          [odom.angular_x,
+                                                           odom.angular_y,
+                                                           odom.angular_z],
+                                                          odom.twist_covariance]
+                                                          )
+                                                          
+        nonce = w3.eth.get_transaction_count(fromAddress)
+        rawtxOptions = {
+            'to': contractAddress,
+            'value': 0,
+            'gas': 2000000,
+            'gasPrice': w3.to_wei('50', 'gwei'),
+            'nonce': nonce,
+            'data': data,
+            'chainId': 1337
+        }
+        
+        # Interacting with contract function
+        signed_txn = w3.eth.account.sign_transaction(rawtxOptions, privateKey)
+        
+        # Send transaction
+        tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        tasks.append(tx_hash)
+
+    # Waiting all tasks to be done
+    resultados = await asyncio.gather(*tasks)
+    print(f"Transactions: {resultados}")
+
+# Main code
+async def main():
+    # Compiling solidity contract
+    compiled_sol = compile_sol()
+
+    # Web3.py instance
+    rpc_url = 'http://127.0.0.1:8545'
+    w3 = Web3(Web3.HTTPProvider(rpc_url))
+
+    # For PoA network
+    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+    # Converting odom.txt to Data structure
+    odom_data = clean_odom('odom.txt')
+	
     # Retrieve the contract interface
     contract_id, contract_interface = compiled_sol.popitem()
 
@@ -369,86 +454,20 @@ def interact(w3, compiled_sol, odom_data):
     # Contract Address and Getting contract
     contractAddress = '0x9FBDa871d559710256a2502A2517b794B482Db40'
     contract = w3.eth.contract(abi=abi, address=contractAddress)
-    
-    transaction_times = []
-    
-    for odom in odom_data:
-        print('Transacting...')
-        # Setting function and getting data
-        data = contract.encodeABI(fn_name='updateOdom', args=[odom.seq,
-                                                            odom.secs,
-                                                            odom.nsecs,
-                                                            odom.frame_id,
-                                                            odom.child_frame_id,
-                                                            [odom.position_x,
-                                                            odom.position_y,
-                                                            odom.position_z],
-                                                            [odom.orientation_x,
-                                                            odom.orientation_y,
-                                                            odom.orientation_z,
-                                                            odom.orientation_w],
-                                                            odom.covariance,
-                                                            [odom.linear_x,
-                                                            odom.linear_y,
-                                                            odom.linear_z],
-                                                            [odom.angular_x,
-                                                            odom.angular_y,
-                                                            odom.angular_z],
-                                                            odom.twist_covariance]
-                                                            )
 
-        nonce = w3.eth.get_transaction_count(fromAddress)
-        rawtxOptions = {
-            'to': contractAddress,  
-            'value': 0,
-            'gas': 2000000,
-            'gasPrice': w3.to_wei('50', 'gwei'),
-            'nonce': nonce,
-            'data': data,  
-            'chainId': 1337
-        }
-
-        start = time.time()
-        # Interacting with contract function
-        signed_txn = w3.eth.account.sign_transaction(rawtxOptions, privateKey)
-
-        # Send transaction
-        tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-
-        # Transaction Done
-        receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    # Sending transactions
+    tps = 10
+    data_lots = [odom_data[i:i + tps] for i in range(0, len(odom_data), tps)]
+    results = []
+    for lot in data_lots:
+        begin = time.time()
+        await lot_transact(w3, contract, fromAddress, contractAddress, privateKey, lot)
+        results.append(time.time() - begin)
         
-        aux_time = time.time() - start
-        transaction_times.append(aux_time)
-        
-        print('Done! Time:', aux_time, 'seconds.')
-
-        print('Receipt: ')
-        print(receipt)
-    
-    return transaction_times
-
-# Main code
-def main():
-    # Compiling solidity contract
-    compiled_sol = compile_sol()
-
-    # Web3.py instance
-    rpc_url = 'http://127.0.0.1:8545'
-    w3 = Web3(Web3.HTTPProvider(rpc_url))
-
-    # For PoA network
-    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-
-    # Converting odom.txt to Data structure
-    odom_data = clean_odom('odom.txt')
-
-    # Sending transactions and getting its time
-    transaction_times = interact(w3, compiled_sol, odom_data)
-
-    with open('out_times.txt', 'a') as f:
-        for time in transaction_times:
-            f.write(str(time) + '\n')
+    # Plotting evaluation results
+    with open('tput.txt', 'w') as f:
+        for result in results:
+            f.write(str(result) + '\n')
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

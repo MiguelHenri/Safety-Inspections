@@ -24,6 +24,11 @@ For IPFS, see https://docs.ipfs.tech/.
 This work presents Python scripts (/python) used to make transactions to an IBFT Hyperledger Besu blockchain network automatically. The time-evaluation Python script cleans ROS topic odometry data and transacts it to the blockchain network using the Web3.py library.
 
 For Hyperledger Besu, see https://besu.hyperledger.org/23.4.0/private-networks/tutorials/ibft.
+
 For Web3.py documentation, see https://web3py.readthedocs.io/en/stable/.
 
 To run transactions on the blockchain network, you may have the odometry (or other) ROS data in a file. Renaming the file in line 444 if needed (odom.txt) and running time-evaluation.py will make the transactions with the data collected automatically, one by one. The Python script first cleans the odom data, and then they send the data, making transactions. Lastly, the transaction times will be saved in an out_times.txt file. This way, you may evaluate your blockchain network.
+
+# 📒 Charts
+
+Used for research purposes. Calculates ROS data sizes, for example.

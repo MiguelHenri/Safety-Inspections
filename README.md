@@ -1,10 +1,6 @@
 # 🔎 Safety Inspections
 
-This repository presents a framework for industrial safety inspections using a robot running ROS and blockchain.
-
-# 🤝 Contributor
-
-https://github.com/rodrigodg1
+This repository presents a framework for industrial safety inspections using a robot running [ROS](https://docs.ros.org/) and blockchain.
 
 # 🖋 Smart Contracts
 
@@ -21,14 +17,24 @@ For IPFS, see https://docs.ipfs.tech/.
 
 # 🎮 Python Code and How to Run
 
-This work presents Python scripts (/python) used to make transactions to an IBFT Hyperledger Besu blockchain network automatically. The time-evaluation Python script cleans ROS topic odometry data and transacts it to the blockchain network using the Web3.py library.
+This work presents Python scripts (/python) used to make transactions to an IBFT Hyperledger Besu blockchain network automatically. The time-evaluation Python script cleans ROS topic [odometry](http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html) data and transacts it to the blockchain network using the [Web3.py](https://web3py.readthedocs.io/en/stable/) library.
 
-For Hyperledger Besu, see https://besu.hyperledger.org/23.4.0/private-networks/tutorials/ibft.
+To run an IBFT Hyperledger Besu blockchain network, see :
 
-For Web3.py documentation, see https://web3py.readthedocs.io/en/stable/.
+- [How to run Besu.](https://besu.hyperledger.org/23.4.0/private-networks/tutorials/ibft)
 
-To run transactions on the blockchain network, you may have the odometry (or other) ROS data in a file. Renaming the file in line 444 if needed (odom.txt) and running time-evaluation.py will make the transactions with the data collected automatically, one by one. The Python script first cleans the odom data, and then they send the data, making transactions. Lastly, the transaction times will be saved in an out_times.txt file. This way, you may evaluate your blockchain network.
+To run transactions on the blockchain network, you must have the odometry (or other) ROS data in a file. The Python script first cleans the odom data, and then it sends the data, making transactions. Lastly, the transaction times will be saved in an out_times.txt file. This way, you may evaluate your blockchain network.
+
+⚠️ Make sure:
+- You have the python script downloaded;
+- The input file is named correctly;
+- The input file is being processed correctly;
+- Your blockchain network is working fine;
 
 # 📒 Charts
 
-Used for research purposes. Calculates ROS data sizes, for example.
+Used for research purposes. It calculates the hashing time for building a Merkle Tree.
+
+# 🤝 Contributor
+
+https://github.com/rodrigodg1

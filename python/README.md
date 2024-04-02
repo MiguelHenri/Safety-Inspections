@@ -19,4 +19,4 @@ To plot a box-plot and also get data metrics, run:
 $python3 plot-time-evaluation.py
 ```
 
-A box-plot named odom-box-plot.pgn and an output file out_time_data.txt will be created. 
+A box-plot named odom-box-plot.png and an output file out_time_data.txt will be created. 

@@ -16,7 +16,7 @@ def plot_box_plot(transaction_times):
     ax.tick_params(axis='both', labelsize=20)
     ax.grid(axis='y') # Add gridlines
 
-    plt.savefig("mygraph.png")
+    plt.savefig("odom-box-plot.png")
 
 def main():
     with open('out_times.txt', 'r') as f:

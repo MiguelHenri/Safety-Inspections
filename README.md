@@ -4,7 +4,7 @@ This repository presents a framework for industrial safety inspections using a r
 
 # 🖋 Smart Contracts
 
-This work presents six smart contracts (/codes) that regulate safety inspections. They are:
+This work presents six smart contracts ([/smart-contracts](https://github.com/MiguelHenri/Safety-Inspections/tree/main/smart-contracts)) that regulate safety inspections. They are:
 
 - `Regulations and Standards`: this contract is used by government entities to specify regulations and standards.
 - `Request Inspection`: this contract is used by a requester to request an inspection in a specific place.

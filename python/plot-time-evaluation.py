@@ -4,7 +4,7 @@ import numpy as np
 # Plotting function
 def plot_box_plot(transaction_times):
     # plt.style.use('seaborn-white')  # Change the box plot style
-    fig, ax = plt.subplots(figsize=(10, 6))  # Adjust the figure size
+    fig, ax = plt.subplots(figsize=(12, 8))  # Adjust the figure size
     
     # Convert strings to floats
     transaction_times = [float(time.strip()) for time in transaction_times]
@@ -16,7 +16,8 @@ def plot_box_plot(transaction_times):
     ax.tick_params(axis='both', labelsize=20)
     ax.grid(axis='y') # Add gridlines
 
-    plt.savefig("odom-box-plot.png")
+    plt.tight_layout()
+    plt.savefig("odom-box-plot.png", dpi=300, bbox_inches='tight')
 
 def main():
     with open('out_times.txt', 'r') as f:
